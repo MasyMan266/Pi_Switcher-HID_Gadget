@@ -140,7 +140,7 @@ def pi_config(cmdline=None, modules=None):
             raise FileNotFoundError(f"Missing cmdline swap file: {new_cmdline_path}")
 
         if not old_cmdline_path.exists():
-            # Not running on real Pi hardware (e.g. local dev/debugging); nothing to swap.
+            # Not running on real Pi hardware (e.g. tlocal dev/debugging); nothing to swap.
             print(f"Skipping cmdline swap, not found: {old_cmdline_path}")
         else:
             temp = old_cmdline_path.read_text()
