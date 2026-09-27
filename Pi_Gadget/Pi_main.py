@@ -11,7 +11,7 @@ import threading
 import time
 from pathlib import Path
 
-import Pi_Gadget.Pi_Gadget_def as pgdef
+import Pi_Gadget_def as pgdef
 
 try:
     from gpiozero import DigitalInputDevice, DigitalOutputDevice, PWMOutputDevice  # type: ignore
