@@ -1,0 +1,1 @@
+STRING Hi there this is the Raspberry Pi typing
