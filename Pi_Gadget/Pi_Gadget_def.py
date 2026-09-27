@@ -1,5 +1,5 @@
 
-from cairo import Path
+from pathlib import Path
 import os
 import subprocess as sup
 
