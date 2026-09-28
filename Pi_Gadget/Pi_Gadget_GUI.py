@@ -48,10 +48,8 @@ class _DummyImage:  # type: ignore[no-redef]
     def paste(self, *_args, **_kwargs):
         return None
 
-    def __new__(cls) -> Self:
-            instance = super().__new__(cls)
-            instance.__init__()
-            return instance
+    def new(self, *args, **kwargs):
+        return self
 
     def __enter__(self):
         return self
