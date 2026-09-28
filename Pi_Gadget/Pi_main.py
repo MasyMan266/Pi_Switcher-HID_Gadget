@@ -11,6 +11,14 @@ import threading
 import time
 from pathlib import Path
 
+try:
+    import Pi_Gadget.LCD_1in44 as LCD_1in44
+except Exception as exc:  # pragma: no cover - depends on hardware
+    LCD_1in44 = None
+    LCD_IMPORT_ERROR = exc
+else:
+    LCD_IMPORT_ERROR = None
+
 if __package__:
     from . import Pi_Gadget_def as pgdef
     from . import Pi_Gadget_GUI as pggui
