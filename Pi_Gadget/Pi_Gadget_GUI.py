@@ -15,6 +15,9 @@ except ImportError:  # pragma: no cover - exercised in non-Pillow environments
 
 
 class _DummyImage:  # type: ignore[no-redef]
+    if 'DummyImage' in type(image).__name__:
+        return
+    
     @staticmethod
     def open(_path):
         return _DummyImage(mode="RGB", size=(128, 128), color=(0, 0, 0))

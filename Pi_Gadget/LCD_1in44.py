@@ -28,7 +28,7 @@ try:
 	import numpy as np
 except:
 	np = None
-import config
+import Pi_Gadget.config as config
 import time
 
 
