@@ -4,7 +4,7 @@ import os
 import subprocess as sup
 
 try:
-    import LCD_1in44
+    import Pi_Gadget.LCD_1in44 as LCD_1in44
 except Exception as exc:  # pragma: no cover - depends on hardware
     LCD_1in44 = None
     LCD_IMPORT_ERROR = exc

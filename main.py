@@ -1,4 +1,4 @@
-import LCD_1in44
+import Pi_Gadget.LCD_1in44 as LCD_1in44
 import time
 
 from PIL import Image,ImageDraw,ImageFont,ImageColor
