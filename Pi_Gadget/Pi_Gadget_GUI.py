@@ -3,7 +3,10 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 from typing import Any, cast
 
-import Pi_Gadget.Pi_Gadget_def as pgdef
+if __package__:
+    from . import Pi_Gadget_def as pgdef
+else:
+    import Pi_Gadget_def as pgdef
 
 try:
     from PIL import Image, ImageDraw, ImageFont

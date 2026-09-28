@@ -11,7 +11,12 @@ import threading
 import time
 from pathlib import Path
 
-import Pi_Gadget_def as pgdef
+if __package__:
+    from . import Pi_Gadget_def as pgdef
+    from . import Pi_Gadget_GUI as pggui
+else:
+    import Pi_Gadget_def as pgdef
+    import Pi_Gadget_GUI as pggui
 
 try:
     from gpiozero import DigitalInputDevice, DigitalOutputDevice, PWMOutputDevice  # type: ignore
@@ -33,13 +38,13 @@ def main():
     menu_stack = ["main"]
     last_action_time = time.monotonic()
 
-    font, small_font = pgdef.load_fonts()
+    font, small_font = pggui.load_fonts()
     print("about to set background_path")
     background_path = Path(__file__).resolve().parent / "mal_I.png"
     print("background_path:", background_path)
     print("path type:", type(background_path))
     print("exists:", background_path.exists())
-    base_image = pgdef.load_background_image(background_path)
+    base_image = pggui.load_background_image(background_path)
 
     while True:
         if current_menu == "updating":
@@ -56,7 +61,7 @@ def main():
             status_message = status_result[0]
             status_thread = None
 
-        pgdef.draw_menu(
+        pggui.draw_menu(
             disp, current_menu, selected_index, base_image, font, small_font, update_error,
             status_message,
         )

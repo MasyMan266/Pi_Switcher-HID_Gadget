@@ -65,11 +65,13 @@ def press_hotkey(keys):
     modifier = 0
     for key in keys[:-1]:
         modifier_code = MODIFIERS.get(key.upper())
+
         if modifier_code is None:
             raise ValueError(f"Unsupported modifier: {key}")
         modifier |= modifier_code
 
     final_key = keys[-1]
+
     key_data = SPECIAL_KEYS.get(final_key.upper()) or KEY_MAP.get(final_key.lower())
     if key_data is None:
         raise ValueError(f"Unsupported hotkey key: {final_key}")
