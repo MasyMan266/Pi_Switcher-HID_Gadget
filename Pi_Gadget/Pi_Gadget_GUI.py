@@ -15,6 +15,8 @@ except ImportError:  # pragma: no cover - exercised in non-Pillow environments
 
 
 class _DummyImage:  # type: ignore[no-redef]
+    if 'DummyImage' in type(image).__name__:
+        return
     
     @staticmethod
     def open(_path):
@@ -46,10 +48,7 @@ class _DummyImage:  # type: ignore[no-redef]
         return self
     def __exit__(self, exc_type, exc, tb):
         return False
-
-    # Skip operations if using the dummy image
-    if 'DummyImage' in type(image).__name__:
-        return
+    
 
 class _DummyImageDraw:  # type: ignore[no-redef]
     @staticmethod
