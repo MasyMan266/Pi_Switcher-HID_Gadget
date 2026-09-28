@@ -1,5 +1,6 @@
 
 from pathlib import Path
+from typing_extensions import Self
 from PIL import Image, ImageDraw
 from typing import Any, cast
 
@@ -46,6 +47,11 @@ class _DummyImage:  # type: ignore[no-redef]
 
     def paste(self, *_args, **_kwargs):
         return None
+
+    def __new__(cls) -> Self:
+            instance = super().__new__(cls)
+            instance.__init__()
+            return instance
 
     def __enter__(self):
         return self
