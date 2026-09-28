@@ -19,10 +19,16 @@ import numpy as np
 
 class _DummyImage:  # type: ignore[no-redef]
     def __init__(self, *args, **kwargs):
-        # Create a mock 128x128 RGB array (height, width, 3 channels)
+        # Create a real, blank 128x128 PIL Image canvas
+        self._pil_img = Image.new("RGB", (128, 128), (0, 0, 0))
+        # Keep a numpy array version for array indexing operations
         self._array = np.zeros((128, 128, 3), dtype=np.uint8)
 
-    # Rocket-propelled indexing to survive NumPy slice notation img[...,[0]]
+    # Mimics PIL Image behavior (.paste, .size, etc.)
+    def __getattr__(self, name):
+        return getattr(self._pil_img, name)
+
+    # Mimics NumPy Array behavior (bracket indexing like img[..., 0])
     def __getitem__(self, index):
         return self._array[index]
 
@@ -33,11 +39,6 @@ class _DummyImage:  # type: ignore[no-redef]
     @property
     def ndim(self):
         return 3
-
-    # Add size property to mimic a standard PIL Image structure
-    @property
-    def size(self):
-        return (128, 128)
 
     def convert(self, *_args, **_kwargs):
         return self
