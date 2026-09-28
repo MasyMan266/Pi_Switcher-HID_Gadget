@@ -14,31 +14,34 @@ except ImportError:  # pragma: no cover - exercised in non-Pillow environments
     Image = ImageDraw = ImageFont = None
 
 
+import numpy as np
+
 class _DummyImage:  # type: ignore[no-redef]
     def __init__(self, *args, **kwargs):
-        pass
+        # Create a mock 128x128 RGB array (height, width, 3 channels)
+        self._array = np.zeros((128, 128, 3), dtype=np.uint8)
 
-    @staticmethod
-    def open(_path):
-        return _DummyImage(mode="RGB", size=(128, 128), color=(0, 0, 0))
+    # Rocket-propelled indexing to survive NumPy slice notation img[...,[0]]
+    def __getitem__(self, index):
+        return self._array[index]
 
-    @staticmethod
-    def new(
-        mode: str,
-        size: tuple[int, int],
-        color: int | str = 0,
-    ):
-        return _DummyImage(mode=mode, size=size, color=color)
+    @property
+    def shape(self):
+        return self._array.shape
 
-    def __init__(self, mode=None, size=None, color=None):
-        self.mode = mode
-        self.size = size or (128, 128)
-        self.color = color
+    @property
+    def ndim(self):
+        return 3
+
+    # Add size property to mimic a standard PIL Image structure
+    @property
+    def size(self):
+        return (128, 128)
+
     def convert(self, *_args, **_kwargs):
         return self
 
     def resize(self, size):
-        self.size = size
         return self
 
     def paste(self, *_args, **_kwargs):
@@ -46,6 +49,7 @@ class _DummyImage:  # type: ignore[no-redef]
 
     def __enter__(self):
         return self
+
     def __exit__(self, exc_type, exc, tb):
         return False
     
