@@ -23,3 +23,8 @@ Traceback (most recent call last):
     return io.open(self, mode, buffering, encoding, errors, newline)
            ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 PermissionError: [Errno 13] Permission denied: '/boot/firmware/cmdline.txt'
+
+
+9/28 
+
+  I am currently going to read through my code and sweep through it all and organize it to my liking. I just really need to know what I can improve on and how to finalize this GUI for the raspberry pi. I am also going to take quite some time to debug it so there are no bugs or syntax errors.

@@ -20,11 +20,13 @@ else:
     LCD_IMPORT_ERROR = None
 
 if __package__:
-    from . import Pi_Gadget_def as pgdef
-    from . import Pi_Gadget_GUI as pggui
+    from . import Pi_def as pgdef
+    from . import Pi_GUI as pggui
+    from . import Gadget_Config as pgconfig
 else:
-    import Pi_Gadget_def as pgdef
-    import Pi_Gadget_GUI as pggui
+    import Pi_Gadget.Pi_def as pgdef
+    import Pi_Gadget.Pi_GUI as pggui
+    import Pi_Gadget.Gadget_Config as pgconfig
 
 try:
     from gpiozero import DigitalInputDevice, DigitalOutputDevice, PWMOutputDevice  # type: ignore
@@ -33,13 +35,16 @@ except ImportError:  # pragma: no cover - exercised in non-gpiozero environments
 
 def main():
     """Run the menu loop and respond to button presses."""
-    pgdef.apply_default_gadget_mode()
+    pgconfig.apply_default_gadget_mode()
     disp = pgdef.initialize_display()
     current_menu = "main"
     selected_index = 0
     update_thread = None
     update_complete = False
     update_error = None
+    update_complete_holder = [False]
+    update_error_holder = [None]
+    update_thread_holder = [None]
     status_message = "Checking USB..."
     status_thread = None
     status_result = [status_message]
@@ -55,6 +60,8 @@ def main():
     base_image = pggui.load_background_image(background_path)
 
     while True:
+        update_complete = update_complete_holder[0]
+        update_error = update_error_holder[0]
         if current_menu == "updating":
             current_menu, selected_index = pgdef.transition_after_update(current_menu, update_complete, update_thread)
 
@@ -112,15 +119,6 @@ def main():
             if current_menu in {"status", "updating"}:
                 current_menu = "main"
                 selected_index = 0
-            elif current_menu == "settings":
-                if len(menu_stack) > 1:
-                    menu_stack.pop()
-                    current_menu = menu_stack[-1]
-                    selected_index = 0
-                else:
-                    current_menu = "main"
-                    selected_index = 0
-
             elif current_menu == "main":
                 next_menu, next_index = pgdef.handle_selection(current_menu, selected_index)
                 current_menu, selected_index = next_menu, next_index
@@ -149,7 +147,7 @@ def main():
                     time.sleep(2)
                     break                           
             elif current_menu == "gadget":
-                if selected_index == 3 and pgdef.current_gadget_mode != pgdef.DEFAULT_GADGET_MODE:
+                if selected_index == 3 and pgconfig.current_gadget_mode != pgdef.DEFAULT_GADGET_MODE:
                     # Leaving the gadget menu: restore default USB mode and reboot so cmdline/module changes apply.
                     sup.run("sudo reboot", shell=True, check=False)
                     time.sleep(2)
@@ -158,10 +156,10 @@ def main():
                     next_menu, next_index = pgdef.handle_selection(current_menu, selected_index)
                     current_menu, selected_index = next_menu, next_index
                 if current_menu == "drive":
-                    pgdef.switch_to_drive_mode()
+                    pgconfig.switch_to_drive_mode()
         
             elif current_menu == "drive":
-                pgdef.restore_default_gadget_mode()
+                pgconfig.restore_default_gadget_mode()
                 current_menu = "gadget"
                 selected_index = 0
 

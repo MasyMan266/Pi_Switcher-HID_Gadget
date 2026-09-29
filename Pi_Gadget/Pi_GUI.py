@@ -1,13 +1,11 @@
 
 from pathlib import Path
-from typing_extensions import Self
-from PIL import Image, ImageDraw
 from typing import Any, cast
 
 if __package__:
-    from . import Pi_Gadget_def as pgdef
+    from . import Pi_def as pgdef
 else:
-    import Pi_Gadget_def as pgdef
+    import Pi_Gadget.Pi_def as pgdef
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -15,98 +13,34 @@ except ImportError:  # pragma: no cover - exercised in non-Pillow environments
     Image = ImageDraw = ImageFont = None
 
 
-import numpy as np
-
-class _DummyImage:  # type: ignore[no-redef]
-    def __init__(self, *args, **kwargs):
-        # Create a real, blank 128x128 PIL Image canvas
-        self._pil_img = Image.new("RGB", (128, 128), (0, 0, 0))
-        # Keep a numpy array version for array indexing operations
-        self._array = np.zeros((128, 128, 3), dtype=np.uint8)
-
-    # Mimics PIL Image behavior (.paste, .size, etc.)
-    def __getattr__(self, name):
-        return getattr(self._pil_img, name)
-
-    # Mimics NumPy Array behavior (bracket indexing like img[..., 0])
-    def __getitem__(self, index):
-        return self._array[index]
-
-    @property
-    def shape(self):
-        return self._array.shape
-
-    @property
-    def ndim(self):
-        return 3
-
-    def convert(self, *_args, **_kwargs):
-        return self
-
-    def resize(self, size):
-        return self
-
-    def paste(self, *_args, **_kwargs):
-        return None
-
-    def new(self, *args, **kwargs):
-        return self
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc, tb):
-        return False
-    
-
-class _DummyImageDraw:  # type: ignore[no-redef]
-    @staticmethod
-    def Draw(_image: Any, mode: str | None = None) -> "_DummyImageDraw":
-        return _DummyImageDraw()
-    
-    def __init__(self, *_args, **_kwargs):
-        pass
-
-    def rectangle(self, *_args: Any, **_kwargs: Any) -> None:
-        return None
-
-    def text(self, *_args: Any, **_kwargs: Any) -> None:
-        return None
-
-class _DummyImageFont:  # type: ignore[no-redef]
-    @staticmethod
-    def truetype(*_args, **_kwargs):
-        return None
-
-    @staticmethod
-    def load_default():
-        return None
-    
-Image = _DummyImage
-ImageDraw = _DummyImageDraw
-ImageFont = _DummyImageFont
-
-
 def load_fonts():
     """Load the fonts used for the menu text."""
+    if ImageFont is None:
+        return None, None
+
+    image_font = cast(Any, ImageFont)
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 11)
-        small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 8)
+        font = image_font.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 11)
+        small_font = image_font.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 8)
     except Exception:
-        font = ImageFont.load_default()
-        small_font = ImageFont.load_default()
+        font = image_font.load_default()
+        small_font = image_font.load_default()
     return font, small_font
 
 def load_background_image(path: Path):
+    if Image is None:
+        return None
+
+    image_module = cast(Any, Image)
     try:
-        with Image.open(path) as image:
+        with image_module.open(path) as image:
             image = image.convert("RGB")
             if image.size != (128, 128):
                 image = image.resize((128, 128))
             return image
     except Exception as exc:
         print(f"Background image unavailable: {exc}")
-        return Image.new("RGB", (128, 128), "Black")
+        return image_module.new("RGB", (128, 128), "Black")
 # Raspberry Pi File Swap
 
 def draw_menu(disp, current_menu, selected_index, base_image, font, small_font, update_error,
@@ -114,12 +48,17 @@ def draw_menu(disp, current_menu, selected_index, base_image, font, small_font, 
     if disp is None:
         print("Display unavalible - running in debug mode")
         return
+    if Image is None or ImageDraw is None:
+        print("Display rendering unavailable: Pillow is not installed")
+        return
 
     try:
-        im = Image.new("RGB", (128, 128), "Black")
+        image_module = cast(Any, Image)
+        image_draw = cast(Any, ImageDraw)
+        im = image_module.new("RGB", (128, 128), "Black")
         if base_image is not None:
             im.paste(base_image, (0, 0))
-        draw = ImageDraw.Draw(cast(Any, im))
+        draw = image_draw.Draw(cast(Any, im))
         
 
         if current_menu == "updating":
@@ -137,7 +76,7 @@ def draw_menu(disp, current_menu, selected_index, base_image, font, small_font, 
         elif current_menu == "drive":
             try:
                 draw.rectangle((8, 8, 120, 120), fill="Blue")
-                with Image.open("/home/masyman266/RaspberryPiCode/usb_image.png") as drive_image:
+                with image_module.open("/home/masyman266/RaspberryPiCode/usb_image.png") as drive_image:
                     drive_image = drive_image.convert("RGB")
                     if drive_image.size != (60, 60):
                         drive_image = drive_image.resize((60, 60))

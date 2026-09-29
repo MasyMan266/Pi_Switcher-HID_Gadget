@@ -6,8 +6,8 @@ from unittest.mock import Mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from Pi_Gadget import Pi_Gadget_def as pgdef
-from Pi_Gadget import Pi_Gadget_GUI as pggui
+from Pi_Gadget import Pi_def as pgdef
+from Pi_Gadget import Pi_GUI as pggui
 from Pi_Gadget import Pi_main as app
 
 
@@ -25,6 +25,11 @@ class PiGadgetTests(unittest.TestCase):
         current_menu, selected_index = pgdef.handle_selection("main", 2)
         self.assertEqual(current_menu, "gadget")
         self.assertEqual(selected_index, 0)
+
+    def test_settings_selections_match_menu_items(self):
+        self.assertEqual(pgdef.handle_selection("settings", 0), ("updating", 0))
+        self.assertEqual(pgdef.handle_selection("settings", 1), ("main", 0))
+        self.assertEqual(pgdef.handle_selection("settings", 2), ("shutdown", 0))
 
     def test_gadget_selection_routes_to_rubber_ducky(self):
         current_menu, selected_index = pgdef.handle_selection("gadget", 0)
@@ -58,6 +63,8 @@ class PiGadgetTests(unittest.TestCase):
             None,
         )
         display.LCD_ShowImage.assert_called_once()
+        image = display.LCD_ShowImage.call_args.args[0]
+        self.assertEqual(image.size, (128, 128))
 
     def test_read_button_state_reads_display_pin_value(self):
         class DummyDisplay:
